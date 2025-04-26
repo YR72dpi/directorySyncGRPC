@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+service Upload {
+  rpc UploadFile (UploadRequest) returns (UploadResponse) {};
+  rpc ClearFolder (ClearRequest) returns (ClearResponse) {};
+}
+
+message UploadRequest {
+  string name = 1;
+  bytes fileContent = 2;
+}
+
+message UploadResponse {
+  bool success = 1;
+  int32 errorCode = 2;
+}
+
+message ClearRequest {
+  bool do = 1;
+}
+
+message ClearResponse {
+  bool success = 1;
+  int32 errorCode = 2;
+}

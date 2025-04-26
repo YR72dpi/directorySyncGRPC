@@ -1,0 +1,36 @@
+
+# source
+services:
+  interface:
+    build: ./interface
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./test/entree:/app/in
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SOCKET_URL="http://localhost:3521"
+
+  runner:
+    build: ./runner
+    environment:
+      - IP_PORT=synced:51500
+    volumes:
+      - ./runner:/app
+      - ./test/entree:/app/in
+    depends_on:
+      - interface
+    command: ["npx", "ts-node", "runner.ts"]
+
+# destination
+  synced:
+    build: ./synced
+    ports:
+      - "3521:3521" # Socket.io
+      - "51500:51500" # gRPC
+    environment:
+      - SOCKET_PORT = "3521"
+      - GRPC_PORT = "51500"
+    volumes:
+      - ./synced:/app
+      - ./test/sortie:/app/out

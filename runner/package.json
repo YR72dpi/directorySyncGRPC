@@ -1,0 +1,26 @@
+{
+    "name": "nws_m1_devoir_grpc_ws",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@grpc/grpc-js": "^1.13.3",
+        "@grpc/proto-loader": "^0.7.15",
+        "express": "^5.1.0",
+        "socket.io": "^4.8.1"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.1",
+        "@types/node": "^22.14.1",
+        "nodemon": "^3.1.9",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    },
+    "description": ""
+}
