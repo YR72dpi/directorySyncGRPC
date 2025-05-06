@@ -29,8 +29,8 @@ services:
       - "3521:3521" # Socket.io
       - "51500:51500" # gRPC
     environment:
-      - SOCKET_PORT = "3521"
-      - GRPC_PORT = "51500"
+      - SOCKET_PORT=3521
+      - GRPC_PORT=51500
     volumes:
       - ./synced:/app
       - ./test/sortie:/app/out
