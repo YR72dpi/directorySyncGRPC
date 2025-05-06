@@ -16,48 +16,38 @@ Il y a la racine du projet un docteur compose avec 3 parties :
 - Le service ``synced`` permet de donner les informations à l'interface graphique sur l'etat de la synchronisation de la destination et à recevoir les fichiers.
 
 ```yml
-version: '3.8'
-
-# === source ===
-
-# Cette partie va recuperer l'etat du dossier source et dossier destination pour comparer leur contenu et l'afficher
+# source
 services:
   interface:
     build: ./interface
     ports:
-      - "3000:3000"
+      - "${INTERFACE_PORT}:3000"
     volumes:
       - ./test/entree:/app/in
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_SOCKET_URL="http://localhost:3521"
+      - NEXT_PUBLIC_SOCKET_URL=http://${DESTINATION_IP}:${SOCKET_PORT}
 
-# cette partie la va envoyer le contenu source vers la destination
   runner:
     build: ./runner
     environment:
-      - IP_PORT=synced:51500
+      - IP_PORT=${DESTINATION_IP}:${GRPC_PORT}
     volumes:
-      - ./runner:/app
-      - ./test/entree:/app/in
+      - ./test/entree:/usr/src/app/in
     depends_on:
       - interface
-    command: ["npx", "ts-node", "runner.ts"]
 
-# === destination ===
-# cette partie là va recevoir les fichiers et donners létat du dossier de destination a l'interface
+# destination
   synced:
     build: ./synced
     ports:
-      - "3521:3521" # Socket.io
-      - "51500:51500" # gRPC
+      - "${SOCKET_PORT}:3521" # Socket.io
+      - "${GRPC_PORT}:51500" # gRPC
     environment:
-      - SOCKET_PORT = "3521"
-      - GRPC_PORT = "51500"
+      - SOCKET_PORT=${SOCKET_PORT}
+      - GRPC_PORT=${GRPC_PORT}
     volumes:
-      - ./synced:/app
-      - ./test/sortie:/app/out
-
+      - ./test/sortie:/usr/src/app/out
 ```
 
 # TO DO
