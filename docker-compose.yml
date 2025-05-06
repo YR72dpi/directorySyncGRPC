@@ -10,6 +10,8 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_SOCKET_URL=http://${DESTINATION_IP}:${SOCKET_PORT}
+    depends_on:
+      - runner
 
   runner:
     build: ./runner
@@ -18,8 +20,8 @@ services:
     volumes:
       - ./test/entree:/usr/src/app/in
     depends_on:
-      - interface
-
+      - synced
+      
 # destination
   synced:
     build: ./synced
