@@ -6,6 +6,8 @@ import path from 'path';
 const packageDefinition = protoLoader.loadSync('./proto/upload.proto');
 const proto = grpc.loadPackageDefinition(packageDefinition) as any;
 
+console.log("Send to "+process.env.IP_PORT)
+
 const client = new proto.Upload(
     process.env.IP_PORT as string,
     grpc.credentials.createInsecure()
