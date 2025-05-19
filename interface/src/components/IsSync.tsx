@@ -21,16 +21,16 @@ export default function IsSync() {
   useEffect(() => {
     const socket: Socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!);
 
+    socket.on("hash_out", (hash: string) => {
+        setHashOut(hash);
+    });
+    
     setInterval(async () => {
       await fetch("/api/scanRoute")
         .then((res) => res.json())
         .then((data) => {
           setHashIn(data.hash);
         });
-
-      socket.on("hash_out", (hash: string) => {
-        setHashOut(hash);
-      });
     }, 1000)
 
     return () => {
@@ -38,9 +38,7 @@ export default function IsSync() {
     };
   }, []);
 
-  setInterval(() => {
-    setIsSync(hashOut === hashIn)
-  }, 1000)
+  setInterval(() => {setIsSync(hashOut === hashIn) }, 1000)
 
   return (
     <Alert className="border-r-accent">
