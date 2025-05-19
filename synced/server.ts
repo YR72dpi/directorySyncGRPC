@@ -74,19 +74,49 @@ const outDir = path.join(__dirname, "./out");
 const server = new grpc.Server();
 
 server.addService(fileSyncPackage.service, {
-  UploadFile: (call: any, callback: any) => {
-    const { name, fileContent } = call.request;
-    const filePath = path.join(outDir, name);
+  StreamUploadFile: (call: any, callback: any) => {
+    let fileName = '';
+    let filePath = '';
+    let writeStream: fs.WriteStream;
 
     if (!fs.existsSync(outDir)) {
-      fs.mkdirSync(outDir);
+      fs.mkdirSync(outDir, { recursive: true });
     }
 
-    fs.writeFile(filePath, fileContent, (err) => {
-      if (err) {
-        return callback(null, { success: false, message: err.message });
+    call.on('data', (chunk: any) => {
+      if (!fileName) {
+        fileName = chunk.name;
+        filePath = path.join(outDir, fileName);
+
+        // Création du stream d’écriture une fois le nom reçu
+        writeStream = fs.createWriteStream(filePath);
       }
-      callback(null, { success: true, message: "File synced." });
+
+      if (chunk.fileChunk && writeStream) {
+        writeStream.write(chunk.fileChunk);
+      }
+    });
+
+    call.on('end', () => {
+      writeStream?.end();
+
+      const timestamp = Date.now();
+      console.log(`[UPLOAD DONE] ${fileName} at ${timestamp}`);
+
+      callback(null, {
+        success: true,
+        ts: timestamp,
+        message: 'File uploaded successfully',
+      });
+    });
+
+    call.on('error', (err: any) => {
+      console.error('[UPLOAD ERROR]', err);
+      callback(null, {
+        success: false,
+        ts: Date.now(),
+        message: err.message,
+      });
     });
   },
 
@@ -95,13 +125,12 @@ server.addService(fileSyncPackage.service, {
       fs.readdirSync(outDir).forEach(file => {
         fs.unlinkSync(path.join(outDir, file));
       });
-      callback(null, { success: true, message: "File synced." });
+      callback(null, { success: true, message: 'Folder cleared.' });
     } catch (err) {
-      callback(null, { success: false, message: err });
+      callback(null, { success: false, message: err as string });
     }
   }
 });
-
 server.bindAsync(`0.0.0.0:${GRPC_PORT}`, grpc.ServerCredentials.createInsecure(), () => {
   console.log(`Serveur gRPC port : ${GRPC_PORT}`);
 });

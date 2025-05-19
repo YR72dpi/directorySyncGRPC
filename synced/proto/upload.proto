@@ -1,18 +1,19 @@
 syntax = "proto3";
 
 service Upload {
-  rpc UploadFile (UploadRequest) returns (UploadResponse) {};
+  rpc StreamUploadFile (stream UploadRequest) returns (UploadResponse) {};
   rpc ClearFolder (ClearRequest) returns (ClearResponse) {};
 }
 
 message UploadRequest {
   string name = 1;
-  bytes fileContent = 2;
+  bytes fileChunk = 2;
 }
 
 message UploadResponse {
   bool success = 1;
-  int32 errorCode = 2;
+  int64 ts = 2;
+  string message = 3;
 }
 
 message ClearRequest {
@@ -21,5 +22,5 @@ message ClearRequest {
 
 message ClearResponse {
   bool success = 1;
-  int32 errorCode = 2;
+  string message = 2;
 }
