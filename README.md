@@ -5,9 +5,11 @@ Il y a aussi une interface graphique sur le port 3000 fait avec nextJS qui vous 
 
 ⚠ __directorySyncGRPC n'est pas (encore) récursif.__ Si vous y mettez un dossier, il ne sera pas synchronisé.
 
+Via gRPC : 10.4 Mo prend environ 70-75 ms à se transferer en local, soit environ 148 Mo/s
+
 # Set Up
 
-Il y a la racine du projet un docteur compose avec 3 parties :
+Il y a la racine du projet un docker compose avec 3 parties :
 
 - Le service ``interface`` permet de voir l'état de la synchronisation par interface graphique sur le port 3000 utilisant websocket pour car peu d'informations mais nécessitant une mise à jours en temps réel. Il n'est pas nécessaire au bon fonctionnement de la synchronisation.
 
@@ -49,6 +51,26 @@ services:
     volumes:
       - ./test/sortie:/usr/src/app/out
 ```
+
+Le Env : 
+
+```
+# "synced" on local
+DESTINATION_IP="synced"
+
+SOCKET_PORT="3521"
+GRPC_PORT="51500"
+
+INTERFACE_PORT="3000"
+```
+
+- ``DESTINATION_IP`` : [IP]:[PORT] du serveur grpc ou se trouve la destination du fichier (ex: 1.2.3.4:51500)
+
+- ``SOCKET_PORT`` : le port où le websocket de la synchronisation de la destination est ouvert
+
+- `` GRPC_PORT`` : le port gRPC du serveur de la destination
+
+- ``INTERFACE_PORT`` : port de l'interface permettant d'avoir un visuel de l'etat de la synchro
 
 # TO DO
 - Le faire en go
