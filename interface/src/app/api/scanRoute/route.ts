@@ -4,8 +4,18 @@ import path from 'path';
 import crypto from 'crypto';
 
 export async function GET() {
-  const scanDir = path.join(process.cwd(), "in");
-  if (!fs.existsSync(scanDir)) return new NextResponse('Directory not found', { status: 404 });
+  let scanDir = path.join(process.cwd(), "in");
+  
+  if (!fs.existsSync(scanDir)) {
+    scanDir = path.join(process.cwd(), "../runner/in")
+    console.log(scanDir)
+    if(!fs.existsSync(scanDir)) {
+
+      return new NextResponse('Directory not found', { status: 500 });
+    }
+  }
+    
+    
 
   const files = fs.readdirSync(scanDir).sort();
   let content = '';
